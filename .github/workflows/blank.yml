@@ -16,24 +16,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find and extract Android Studio project ZIP
+      - name: Find and extract upgraded Android Studio project ZIP
         run: |
           set -e
-          if [ -f "Mahfazti-AndroidStudio-Project (225).zip" ]; then
-            ZIP="Mahfazti-AndroidStudio-Project (225).zip"
-          elif [ -f "Mahfazti-AndroidStudio-Package(69).zip" ]; then
-            ZIP="Mahfazti-AndroidStudio-Package(69).zip"
-          else
-            ZIP=$(find . -maxdepth 2 -type f -iname "*.zip" ! -name "mahfazti-android-source*" -printf '%s %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)
-          fi
-          if [ -z "$ZIP" ]; then
-            echo "No full Android Studio project ZIP found"
+          ZIP="Mahfazti-AndroidStudio-Upgraded 666(1).zip"
+          if [ ! -f "$ZIP" ]; then
+            echo "Required project ZIP not found: $ZIP"
+            ls -lah
             exit 1
           fi
+          echo "Selected project archive: $ZIP"
+          sha256sum "$ZIP"
           mkdir -p project
           unzip -q "$ZIP" -d project
           echo "Project extracted from: $ZIP"
-          find project -maxdepth 3 -type f | head -n 80
+          find project -maxdepth 4 -type f | head -n 120
 
       - name: Locate Gradle project
         run: |
@@ -44,7 +41,7 @@ jobs:
           fi
           if [ -z "$GRADLE_FILE" ]; then
             echo "Gradle settings file not found in extracted ZIP"
-            find project -maxdepth 5 -type f | head -n 150
+            find project -maxdepth 6 -type f | head -n 200
             exit 1
           fi
           PROJECT_DIR=$(dirname "$GRADLE_FILE")
@@ -73,6 +70,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Mahfazti-APK
+          name: Mahfazti-Upgraded-APK
           path: project/**/build/outputs/apk/debug/*.apk
           if-no-files-found: error
