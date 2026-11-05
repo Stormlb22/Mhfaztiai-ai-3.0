@@ -31,10 +31,13 @@ jobs:
       - name: Locate Gradle project
         run: |
           set -e
-          GRADLE_FILE=$(find project \\( -name settings.gradle -o -name settings.gradle.kts \\) -print -quit)
+          GRADLE_FILE=$(find project -type f -name settings.gradle -print -quit)
+          if [ -z "$GRADLE_FILE" ]; then
+            GRADLE_FILE=$(find project -type f -name settings.gradle.kts -print -quit)
+          fi
           if [ -z "$GRADLE_FILE" ]; then
             echo "Gradle settings file not found in extracted ZIP"
-            find project -maxdepth 4 -type f | head -n 100
+            find project -maxdepth 5 -type f | head -n 150
             exit 1
           fi
           PROJECT_DIR=$(dirname "$GRADLE_FILE")
