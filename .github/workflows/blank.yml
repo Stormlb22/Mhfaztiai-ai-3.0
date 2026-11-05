@@ -16,17 +16,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find and extract project ZIP
+      - name: Find and extract Android Studio project ZIP
         run: |
           set -e
-          ZIP=$(find . -maxdepth 2 -type f -iname "*.zip" | head -n 1)
+          if [ -f "Mahfazti-AndroidStudio-Project (225).zip" ]; then
+            ZIP="Mahfazti-AndroidStudio-Project (225).zip"
+          elif [ -f "Mahfazti-AndroidStudio-Package(69).zip" ]; then
+            ZIP="Mahfazti-AndroidStudio-Package(69).zip"
+          else
+            ZIP=$(find . -maxdepth 2 -type f -iname "*.zip" ! -name "mahfazti-android-source*" -printf '%s %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)
+          fi
           if [ -z "$ZIP" ]; then
-            echo "No project ZIP found"
+            echo "No full Android Studio project ZIP found"
             exit 1
           fi
           mkdir -p project
           unzip -q "$ZIP" -d project
           echo "Project extracted from: $ZIP"
+          find project -maxdepth 3 -type f | head -n 80
 
       - name: Locate Gradle project
         run: |
